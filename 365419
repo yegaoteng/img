@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>img</title>
+    <style>
+        /* 1. 图片排列整齐代码 */
+        body {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            padding: 20px;
+            background-color: #f5f5f5;
+            margin: 0;
+            font-family: sans-serif;
+        }
+        .image-container {
+            width: 200px;
+            height: 200px;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .image-container:hover {
+            transform: scale(1.03);
+        }
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* 2. 点击放大模态框样式 */
+        #modalOverlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        #modalImage {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 4px;
+        }
+        #closeModal {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 40px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        /* 3. 长按提示样式 */
+        .download-hint {
+            position: absolute;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            width: 100%;
+            text-align: center;
+            padding: 5px 0;
+            font-size: 12px;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .image-container:hover .download-hint {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- 原有图片，包裹在容器中 -->
+    <div class="image-container" data-src="1.jpg">
+        <img src="1.jpg" alt="图片1">
+        <div class="download-hint">长按图片可下载</div>
+    </div>
+    <div class="image-container" data-src="2.jpg">
+        <img src="2.jpg" alt="图片2">
+        <div class="download-hint">长按图片可下载</div>
+    </div>
+    <div class="image-container" data-src="3.jpg">
+        <img src="3.jpg" alt="图片3">
+        <div class="download-hint">长按图片可下载</div>
+    </div>
+    <div class="image-container" data-src="4.jpg">
+        <img src="4.jpg" alt="图片4">
+        <div class="download-hint">长按图片可下载</div>
+    </div>
+    <div class="image-container" data-src="5.jpg">
+        <img src="5.jpg" alt="图片5">
+        <div class="download-hint">长按图片可下载</div>
+    </div>
+    <div class="image-container" data-src="6.jpg">
+        <img src="6.jpg" alt="图片6">
+        <div class="download-hint">长按图片可下载</div>
+    </div>
+    <div class="image-container" data-src="7.jpg">
+        <img src="7.jpg" alt="图片7">
+        <div class="download-hint">长按图片可下载</div>
+    </div>
+    <div class="image-container" data-src="8.jpg">
+        <img src="8.jpg" alt="图片8">
+        <div class="download-hint">长按图片可下载</div>
+    </div>
+    <div class="image-container" data-src="9.jpg">
+        <img src="9.jpg" alt="图片9">
+        <div class="download-hint">长按图片可下载</div>
+    </div>
+    <div class="image-container" data-src="10.jpg">
+        <img src="10.jpg" alt="图片10">
+        <div class="download-hint">长按图片可下载</div>
+    </div>
+    <div class="image-container" data-src="11.jpg">
+        <img src="11.jpg" alt="图片11">
+        <div class="download-hint">长按图片可下载</div>
+    </div>
+    <div class="image-container" data-src="12.jpg">
+        <img src="12.jpg" alt="图片12">
+        <div class="download-hint">长按图片可下载</div>
+    </div>
+
+    <!-- 点击放大模态框 -->
+    <div id="modalOverlay">
+        <span id="closeModal">&times;</span>
+        <img id="modalImage" src="" alt="放大图片">
+    </div>
+
+    <script>
+        // 2. 点击放大功能
+        const imageContainers = document.querySelectorAll('.image-container');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalImage = document.getElementById('modalImage');
+        const closeModal = document.getElementById('closeModal');
+
+        imageContainers.forEach(container => {
+            container.addEventListener('click', function() {
+                const imgSrc = this.getAttribute('data-src');
+                modalImage.src = imgSrc;
+                modalOverlay.style.display = 'flex';
+            });
+        });
+
+        closeModal.addEventListener('click', function() {
+            modalOverlay.style.display = 'none';
+        });
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === modalOverlay) {
+                modalOverlay.style.display = 'none';
+            }
+        });
+
+        // 3. 长按下载功能
+        imageContainers.forEach(container => {
+            let pressTimer;
+            const imgElement = container.querySelector('img');
+
+            container.addEventListener('mousedown', function(e) {
+                // 防止在长按时触发拖拽等默认行为
+                e.preventDefault();
+                pressTimer = window.setTimeout(function() {
+                    triggerDownload(imgElement.src);
+                }, 800); // 长按800毫秒触发下载
+            });
+
+            container.addEventListener('touchstart', function(e) {
+                pressTimer = window.setTimeout(function() {
+                    triggerDownload(imgElement.src);
+                }, 800);
+            });
+
+            // 清除定时器，防止误触发
+            const clearPressTimer = function() {
+                if (pressTimer) {
+                    clearTimeout(pressTimer);
+                    pressTimer = null;
+                }
+            };
+            container.addEventListener('mouseup', clearPressTimer);
+            container.addEventListener('mouseleave', clearPressTimer);
+            container.addEventListener('touchend', clearPressTimer);
+            container.addEventListener('touchcancel', clearPressTimer);
+        });
+
+        function triggerDownload(imageUrl) {
+            // 创建一个隐藏的<a>标签来触发下载
+            const link = document.createElement('a');
+            link.href = imageUrl;
+            // 从URL中提取文件名，作为下载时的默认文件名
+            const fileName = imageUrl.split('/').pop();
+            link.download = fileName || 'downloaded_image.jpg';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            // 可选：给出下载提示
+            alert(`图片 "${fileName}" 已开始下载。`);
+        }
+    </script>
+</body>
+</html>
